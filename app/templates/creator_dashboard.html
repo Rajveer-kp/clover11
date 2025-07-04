@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creator Dashboard - YouTube Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <!-- AdSense script - properly loaded once -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5425864168922727" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --primary-color: #FF0000;
+      --secondary-color: #282828;
+      --accent-color: #FF4444;
+      --text-muted: #606060;
+      --background-light: #f8f9fa;
+      --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      --border-radius: 12px;
+    }
+
+    body {
+      background-color: var(--background-light);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .navbar {
+      background: linear-gradient(135deg, var(--secondary-color) 0%, #1a1a1a 100%) !important;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+
+    .card {
+      border: none;
+      border-radius: var(--border-radius);
+      box-shadow: var(--card-shadow);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .welcome-card {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+      color: white;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .welcome-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      transform: translate(30px, -30px);
+    }
+
+    .youtube-connect-card {
+      background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+      color: white;
+      border: none;
+    }
+
+    .youtube-connect-card .btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .youtube-connect-card .btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .stats-card {
+      transition: all 0.3s ease;
+      border-left: 4px solid transparent;
+    }
+
+    .stats-card:hover {
+      transform: translateY(-5px);
+      border-left-color: var(--primary-color);
+    }
+
+    .stats-card .card-body {
+      padding: 1.5rem;
+    }
+
+    .stats-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 0.5rem 0;
+    }
+
+    .pending-card {
+      background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+      color: white;
+    }
+
+    .approved-card {
+      background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+      color: white;
+    }
+
+    .total-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .team-card {
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      color: #333;
+    }
+
+    .table {
+      border-radius: var(--border-radius);
+      overflow: hidden;
+    }
+
+    .table th {
+      background: var(--background-light);
+      border-top: none;
+      font-weight: 600;
+      color: var(--secondary-color);
+      padding: 1rem;
+    }
+
+    .table td {
+      padding: 1rem;
+      border-color: #f1f3f5;
+    }
+
+    .action-buttons .btn {
+      margin: 0 2px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .action-buttons .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+
+    .empty-state i {
+      font-size: 4rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .youtube-status {
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      background: rgba(255, 255, 255, 0.1);
+      margin-bottom: 1rem;
+    }
+
+    .connected-status {
+      background: rgba(76, 175, 80, 0.1);
+      color: #4CAF50;
+      border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+
+    .disconnected-status {
+      background: rgba(244, 67, 54, 0.1);
+      color: #F44336;
+      border: 1px solid rgba(244, 67, 54, 0.3);
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .quick-action-btn {
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      text-decoration: none;
+      color: white;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .quick-action-btn:hover {
+      transform: translateY(-2px);
+      color: white;
+    }
+
+    .modal-content {
+      border-radius: var(--border-radius);
+    }
+
+    .modal-header {
+      border-bottom: 1px solid #f1f3f5;
+      padding: 1.5rem;
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    .video-thumbnail {
+      width: 120px;
+      height: 68px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: var(--primary-color);
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <i class="fab fa-youtube me-2"></i>Creator Studio
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="/creator">
+              <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/analytics">
+              <i class="fas fa-chart-line me-1"></i>Analytics
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/settings">
+              <i class="fas fa-cog me-1"></i>Settings
+            </a>
+          </li>
+        </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+              <div class="me-2">
+                <i class="fas fa-user-circle me-1"></i>
+                {% if user %}{{ user.name }}{% endif %}
+              </div>
+              <span class="badge bg-success">Creator</span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i>Profile</a></li>
+              <li><a class="dropdown-item" href="/settings"><i class="fas fa-cog me-2"></i>Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container-fluid mt-4">
+    <div class="row">
+      <div class="col-12">
+        <!-- Welcome Card -->
+        <div class="card welcome-card shadow-sm mb-4">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h1 class="mb-3">
+                  <i class="fas fa-crown me-2"></i>
+                  Welcome back, {% if user %}{{ user.name }}{% endif %}!
+                </h1>
+                <p class="mb-0 fs-5 opacity-90">
+                  Manage your YouTube channel and approve content from your editors.
+                </p>
+              </div>
+              <div class="col-md-4 text-md-end">
+                <div class="d-flex flex-column align-items-md-end">
+                  <div class="badge bg-light text-dark fs-6 px-3 py-2 mb-2">
+                    <i class="fas fa-video me-1"></i>
+                    Creator Account
+                  </div>
+                  <small class="text-white-50">
+                    <i class="fas fa-calendar me-1"></i>
+                    Today: {{ current_date.strftime('%B %d, %Y') }}
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Google AdSense Banner Ad -->
+        <div class="text-center mb-4" style="border: 2px dashed #ddd; padding: 20px; min-height: 120px;">
+          <small class="text-muted d-block mb-2">🔧 AdSense Debug: Slot 1283888354</small>
+          <ins class="adsbygoogle"
+               style="display:block"
+               data-ad-client="ca-pub-5425864168922727"
+               data-ad-slot="1283888354"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
+          <script>
+               (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+          <small class="text-muted d-block mt-2">If you see this border but no ad, check the troubleshooting tips at <a href="/adsense-test">/adsense-test</a></small>
+        </div>
+
+        <!-- YouTube Connection Status -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="card youtube-connect-card shadow-sm">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col-md-8">
+                    <div class="d-flex align-items-center mb-3">
+                      <i class="fab fa-youtube fa-2x me-3"></i>
+                      <div>
+                        <h4 class="mb-1">YouTube Channel Connection</h4>
+                        {% if youtube_connected %}
+                          <div class="youtube-status connected-status">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Connected to: <strong>{{ youtube_channel_name }}</strong>
+                          </div>
+                        {% else %}
+                          <div class="youtube-status disconnected-status">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            Not connected to YouTube
+                          </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                    
+                    {% if not youtube_connected %}
+                      <p class="mb-0 opacity-90 youtube-channel-info">
+                        Connect your YouTube channel to start approving and publishing videos from your editors.
+                      </p>
+                    {% else %}
+                      <p class="mb-0 opacity-90 youtube-channel-info">
+                        Your channel is connected and ready to receive uploads.
+                      </p>
+                    {% endif %}
+                  </div>
+                  <div class="col-md-4 text-md-end">
+                    {% if not youtube_connected %}
+                      <a href="{{ url_for('youtube.authorize') }}" class="btn btn-light btn-lg pulse">
+                        <i class="fab fa-youtube me-2"></i>
+                        Connect YouTube
+                      </a>
+                    {% else %}
+                      <div class="d-flex flex-column align-items-md-end gap-2">
+                        <a href="{{ url_for('youtube.disconnect') }}" class="btn btn-outline-light">
+                          <i class="fas fa-unlink me-2"></i>
+                          Disconnect
+                        </a>
+                        <a href="{{ url_for('youtube.authorize') }}" class="btn btn-outline-light">
+                          <i class="fas fa-sync me-2"></i>
+                          Refresh Connection
+                        </a>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Cards Row -->
+        <div class="row mb-4">
+          <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stats-card total-card shadow-sm h-100">
+              <div class="card-body text-center">
+                <i class="fas fa-video fa-3x mb-3"></i>
+                <h5 class="card-title">Total Videos</h5>
+                <div class="stats-number">{% if total_videos %}{{ total_videos }}{% else %}0{% endif %}</div>
+                <small class="opacity-75">All time uploads</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stats-card pending-card shadow-sm h-100">
+              <div class="card-body text-center position-relative">
+                <i class="fas fa-clock fa-3x mb-3"></i>
+                <h5 class="card-title">Pending Approval</h5>
+                <div class="stats-number">{% if pending_videos %}{{ pending_videos|length }}{% else %}0{% endif %}</div>
+                <small class="opacity-75">Awaiting your review</small>
+                {% if pending_videos and pending_videos|length > 0 %}
+                  <div class="notification-badge">!</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stats-card approved-card shadow-sm h-100">
+              <div class="card-body text-center">
+                <i class="fas fa-check-circle fa-3x mb-3"></i>
+                <h5 class="card-title">Approved</h5>
+                <div class="stats-number">{% if approved_videos_count %}{{ approved_videos_count }}{% else %}0{% endif %}</div>
+                <small class="opacity-75">Ready to publish</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stats-card team-card shadow-sm h-100">
+              <div class="card-body text-center">
+                <i class="fas fa-users fa-3x mb-3"></i>
+                <h5 class="card-title">Team Members</h5>
+                <div class="stats-number">{% if team_members %}{{ team_members }}{% else %}0{% endif %}</div>
+                <small class="opacity-75">Accepted editors</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pending Video Approvals -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-white">
+            <div class="row align-items-center">
+              <div class="col">
+                <h4 class="mb-0">
+                  <i class="fas fa-tasks me-2 text-warning"></i>
+                  Videos Awaiting Your Approval
+                </h4>
+                <small class="text-muted">Review and approve videos from your editors</small>
+              </div>
+              <div class="col-auto">
+                {% if pending_videos %}
+                  <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+                    {{ pending_videos|length }} pending
+                  </span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            {% if pending_videos %}
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th style="width: 140px;"><i class="fas fa-image me-1"></i>Preview</th>
+                      <th><i class="fas fa-video me-1"></i>Video Details</th>
+                      <th><i class="fas fa-user me-1"></i>Editor</th>
+                      <th><i class="fas fa-calendar me-1"></i>Uploaded</th>
+                      <th><i class="fas fa-tools me-1"></i>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for video in pending_videos %}
+                      <tr>
+                        <td>
+                          <div class="video-thumbnail">
+                            <i class="fas fa-play-circle fa-2x text-muted"></i>
+                          </div>
+                        </td>
+                        <td>
+                          <div>
+                            <h6 class="mb-1 fw-bold">{{ video.title }}</h6>
+                            {% if video.description %}
+                              <p class="text-muted mb-1 small">{{ video.description[:100] }}{% if video.description|length > 100 %}...{% endif %}</p>
+                            {% endif %}
+                            {% if video.tags %}
+                              <div class="mt-1">
+                                {% for tag in video.tags.split(',')[:3] %}
+                                  <span class="badge bg-light text-dark me-1">#{{ tag.strip() }}</span>
+                                {% endfor %}
+                              </div>
+                            {% endif %}
+                          </div>
+                        </td>
+                        <td>
+                          <div class="d-flex align-items-center">
+                            <div class="me-2">
+                              <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                {{ video.uploader.name[0].upper() }}
+                              </div>
+                            </div>
+                            <div>
+                              <div class="fw-medium">{{ video.uploader.name }}</div>
+                              <small class="text-muted">Editor</small>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="text-muted">
+                            {% if video.created_at %}
+                              <div>{{ video.created_at.strftime('%b %d, %Y') }}</div>
+                              <small>{{ video.created_at.strftime('%I:%M %p') }}</small>
+                            {% else %}
+                              <span class="text-muted">N/A</span>
+                            {% endif %}
+                          </div>
+                        </td>
+                        <td>
+                          <div class="d-flex gap-2 action-buttons">
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#videoModal{{ video.id }}">
+                              <i class="fas fa-eye me-1"></i>Preview
+                            </button>
+                            <a href="{{ url_for('youtube.approve_video', video_id=video.id) }}" 
+                               class="btn btn-success btn-sm" 
+                               onclick="return confirm('Are you sure you want to approve and publish this video?')">
+                              <i class="fas fa-check me-1"></i>Approve
+                            </a>
+                            <a href="{{ url_for('youtube.reject_video', video_id=video.id) }}" 
+                               class="btn btn-danger btn-sm" 
+                               onclick="return confirm('Are you sure you want to reject this video?')">
+                              <i class="fas fa-times me-1"></i>Reject
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <!-- Video Details Modal -->
+                      <div class="modal fade" id="videoModal{{ video.id }}" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title">
+                                <i class="fas fa-video me-2"></i>{{ video.title }}
+                              </h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                              <div class="row">
+                                <div class="col-md-4">
+                                  <div class="video-thumbnail mx-auto" style="width: 100%; height: 200px;">
+                                    <i class="fas fa-play-circle fa-4x text-muted"></i>
+                                  </div>
+                                </div>
+                                <div class="col-md-8">
+                                  <div class="row">
+                                    <div class="col-sm-6">
+                                      <h6><i class="fas fa-user me-1"></i>Editor</h6>
+                                      <p class="mb-3">{{ video.uploader.name }}</p>
+                                    </div>
+                                    <div class="col-sm-6">
+                                      <h6><i class="fas fa-calendar me-1"></i>Upload Date</h6>
+                                      <p class="mb-3">{% if video.created_at %}{{ video.created_at.strftime('%B %d, %Y at %I:%M %p') }}{% else %}N/A{% endif %}</p>
+                                    </div>
+                                  </div>
+                                  
+                                  {% if video.description %}
+                                    <h6><i class="fas fa-align-left me-1"></i>Description</h6>
+                                    <div class="p-3 bg-light rounded mb-3">
+                                      <p class="mb-0">{{ video.description }}</p>
+                                    </div>
+                                  {% endif %}
+                                  
+                                  {% if video.tags %}
+                                    <h6><i class="fas fa-tags me-1"></i>Tags</h6>
+                                    <div class="mb-3">
+                                      {% for tag in video.tags.split(',') %}
+                                        <span class="badge bg-primary me-1 mb-1">#{{ tag.strip() }}</span>
+                                      {% endfor %}
+                                    </div>
+                                  {% endif %}
+                                </div>
+                              </div>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-1"></i>Close
+                              </button>
+                              <a href="{{ url_for('youtube.reject_video', video_id=video.id) }}" class="btn btn-danger">
+                                <i class="fas fa-times me-1"></i>Reject Video
+                              </a>
+                              <a href="{{ url_for('youtube.approve_video', video_id=video.id) }}" class="btn btn-success">
+                                <i class="fas fa-check me-1"></i>Approve & Publish
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <div class="empty-state">
+                <i class="fas fa-check-circle text-success"></i>
+                <h5 class="text-muted">All caught up!</h5>
+                <p class="text-muted">No videos are currently awaiting your approval.</p>
+                <div class="quick-actions">
+                  <a href="/invite-editor" class="quick-action-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="fas fa-user-plus me-2"></i>
+                    Invite Editor
+                  </a>
+                  <a href="/channel-settings" class="quick-action-btn" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #333;">
+                    <i class="fas fa-cog me-2"></i>
+                    Channel Settings
+                  </a>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Approved Videos -->
+        {% if approved_videos %}
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-white">
+            <div class="row align-items-center">
+              <div class="col">
+                <h4 class="mb-0">
+                  <i class="fas fa-check-circle me-2 text-success"></i>
+                  Recently Approved Videos
+                </h4>
+                <small class="text-muted">Videos that have been uploaded to YouTube</small>
+              </div>
+              <div class="col-auto">
+                <span class="badge bg-success fs-6 px-3 py-2">
+                  {{ approved_videos|length }} recent
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th><i class="fas fa-video me-1"></i>Video Details</th>
+                    <th><i class="fas fa-user me-1"></i>Editor</th>
+                    <th><i class="fas fa-calendar me-1"></i>Approved</th>
+                    <th><i class="fas fa-link me-1"></i>YouTube Link</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for video in approved_videos %}
+                    <tr>
+                      <td>
+                        <div>
+                          <h6 class="mb-1 fw-bold">{{ video.title }}</h6>
+                          {% if video.description %}
+                            <p class="text-muted mb-1 small">{{ video.description[:60] }}{% if video.description|length > 60 %}...{% endif %}</p>
+                          {% endif %}
+                          {% if video.tags %}
+                            <div class="mt-1">
+                              {% for tag in video.tags.split(',')[:2] %}
+                                <span class="badge bg-light text-dark me-1">#{{ tag.strip() }}</span>
+                              {% endfor %}
+                            </div>
+                          {% endif %}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <div class="me-2">
+                            <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                              {{ video.uploader.name[0].upper() }}
+                            </div>
+                          </div>
+                          <div>
+                            <div class="fw-medium">{{ video.uploader.name }}</div>
+                            <small class="text-muted">Editor</small>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="text-muted">
+                          {% if video.updated_at %}
+                            <div>{{ video.updated_at.strftime('%b %d, %Y') }}</div>
+                            <small>{{ video.updated_at.strftime('%I:%M %p') }}</small>
+                          {% else %}
+                            <span class="text-muted">N/A</span>
+                          {% endif %}
+                        </div>
+                      </td>
+                      <td>
+                        {% if video.youtube_video_id %}
+                          <a href="https://www.youtube.com/watch?v={{ video.youtube_video_id }}" target="_blank" class="btn btn-outline-danger btn-sm">
+                            <i class="fab fa-youtube me-1"></i>View on YouTube
+                          </a>
+                        {% else %}
+                          <span class="badge bg-warning text-dark">
+                            <i class="fas fa-clock me-1"></i>Processing
+                          </span>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if user.role == 'editor' %}
+          <!-- Quick Actions for Editors -->
+          <div class="card shadow-sm">
+            <div class="card-header bg-white">
+              <h4 class="mb-0">
+                <i class="fas fa-bolt me-2 text-primary"></i>
+                Quick Actions
+              </h4>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <a href="/upload" class="btn btn-primary btn-lg w-100">
+                    <i class="fas fa-upload me-2"></i>
+                    Upload New Video
+                  </a>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <a href="/my-videos" class="btn btn-outline-primary btn-lg w-100">
+                    <i class="fas fa-video me-2"></i>
+                    My Videos
+                  </a>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <a href="/analytics" class="btn btn-outline-secondary btn-lg w-100">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Analytics
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Sidebar with Ads -->
+    <div class="row mt-4">
+      <div class="col-lg-9">
+        <!-- Main content area - can be extended later -->
+      </div>
+      <div class="col-lg-3">
+        <!-- Google AdSense Sidebar Ad -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h6 class="mb-0 text-muted">Sponsored</h6>
+          </div>
+          <div class="card-body p-2">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-5425864168922727"
+                 data-ad-slot="1283888354"
+                 data-ad-format="rectangle"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+          </div>
+        </div>
+
+        <!-- Additional Sidebar Ad -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h6 class="mb-0 text-muted">Advertisement</h6>
+          </div>
+          <div class="card-body p-2">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-5425864168922727"
+                 data-ad-slot="1283888354"
+                 data-ad-format="rectangle"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+          </div>
+        </div>
+
+        <!-- Quick Actions with Ad -->
+        <div class="card">
+          <div class="card-header">
+            <h6 class="mb-0"><i class="fas fa-rocket me-2"></i>Quick Actions</h6>
+          </div>
+          <div class="card-body">
+            <div class="d-grid gap-2">
+              <a href="/invite-editor" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-user-plus me-2"></i>Invite Editor
+              </a>
+              <a href="/analytics" class="btn btn-outline-success btn-sm">
+                <i class="fas fa-chart-line me-2"></i>View Analytics
+              </a>
+              <a href="/settings" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-cog me-2"></i>Settings
+              </a>
+            </div>
+            
+            <!-- Small inline ad -->
+            <div class="mt-3 text-center">
+              <ins class="adsbygoogle"
+                   style="display:block"
+                   data-ad-client="ca-pub-5425864168922727"
+                   data-ad-slot="1283888354"
+                   data-ad-format="auto"
+                   data-full-width-responsive="true"></ins>
+              <script>
+                   (adsbygoogle = window.adsbygoogle || []).push({});
+              </script>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Enhanced JavaScript for better user experience
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add loading states to action buttons
+      const actionButtons = document.querySelectorAll('a[href*="approve"], a[href*="reject"]');
+      actionButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+          const icon = this.querySelector('i');
+          const originalClass = icon.className;
+          const originalText = this.innerHTML;
+          
+          // Add loading state
+          icon.className = 'fas fa-spinner fa-spin';
+          this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Processing...';
+          this.disabled = true;
+          
+          // Reset after delay if navigation fails
+          setTimeout(() => {
+            icon.className = originalClass;
+            this.innerHTML = originalText;
+            this.disabled = false;
+          }, 5000);
+        });
+      });
+
+      // Auto-refresh notification counts
+      function updateNotifications() {
+        fetch('/youtube/api/notifications/count')
+          .then(response => response.json())
+          .then(data => {
+            if (data.pending > 0) {
+              document.querySelectorAll('.notification-badge').forEach(badge => {
+                badge.textContent = data.pending;
+                badge.style.display = 'flex';
+              });
+            } else {
+              document.querySelectorAll('.notification-badge').forEach(badge => {
+                badge.style.display = 'none';
+              });
+            }
+          })
+          .catch(error => console.log('Notification update failed:', error));
+      }
+
+      // Check for new notifications every 30 seconds
+      setInterval(updateNotifications, 30000);
+
+      // Add smooth animations to cards
+      const cards = document.querySelectorAll('.stats-card');
+      cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-8px) scale(1.02)';
+        });
+        card.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0) scale(1)';
+        });
+      });
+
+      // Enhanced modal functionality
+      const videoModals = document.querySelectorAll('[id^="videoModal"]');
+      videoModals.forEach(modal => {
+        modal.addEventListener('show.bs.modal', function() {
+          // Add entrance animation
+          const modalDialog = this.querySelector('.modal-dialog');
+          modalDialog.style.animation = 'slideInDown 0.3s ease-out';
+        });
+      });
+
+      // Toast notifications for user feedback
+      function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+        toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        toast.innerHTML = `
+          ${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+          toast.remove();
+        }, 5000);
+      }
+
+      // Check YouTube connection status
+      function checkYouTubeConnection() {
+        // Add timestamp to prevent caching
+        const timestamp = new Date().getTime();
+        fetch('/youtube/api/youtube/status?t=' + timestamp, {
+          cache: 'no-cache',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('API call failed');
+            }
+            return response.json();
+          })
+          .then(data => {
+            const statusElement = document.querySelector('.youtube-status');
+            const channelInfoElement = document.querySelector('.youtube-channel-info');
+            const connectButtonContainer = statusElement.closest('.card-body').querySelector('.col-md-4');
+            
+            if (data.connected) {
+              statusElement.className = 'youtube-status connected-status';
+              statusElement.innerHTML = '<i class="fas fa-check-circle me-2"></i>Connected to: <strong>' + (data.channel_name || 'Unknown Channel') + '</strong>';
+              
+              if (channelInfoElement) {
+                channelInfoElement.textContent = 'Your channel is connected and ready to receive uploads.';
+              }
+              
+              // Update buttons
+              if (connectButtonContainer) {
+                connectButtonContainer.innerHTML = `
+                  <div class="d-flex flex-column align-items-md-end gap-2">
+                    <a href="/youtube/disconnect" class="btn btn-outline-light">
+                      <i class="fas fa-unlink me-2"></i>
+                      Disconnect
+                    </a>
+                    <a href="/youtube/authorize" class="btn btn-outline-light">
+                      <i class="fas fa-sync me-2"></i>
+                      Refresh Connection
+                    </a>
+                  </div>`;
+              }
+            } else {
+              statusElement.className = 'youtube-status disconnected-status';
+              statusElement.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>Not connected to YouTube';
+              
+              if (channelInfoElement) {
+                channelInfoElement.textContent = 'Connect your YouTube channel to start approving and publishing videos from your editors.';
+              }
+              
+              // Update buttons
+              if (connectButtonContainer) {
+                connectButtonContainer.innerHTML = `
+                  <a href="/youtube/authorize" class="btn btn-light btn-lg pulse">
+                    <i class="fab fa-youtube me-2"></i>
+                    Connect YouTube
+                  </a>`;
+              }
+            }
+            
+            console.log('YouTube status updated:', data);
+          })
+          .catch(error => {
+            console.error('YouTube status check failed:', error);
+            // Don't update UI on error - keep the server-rendered state
+          });
+      }
+
+      // Check YouTube connection every 5 minutes (less aggressive)
+      setInterval(checkYouTubeConnection, 300000);
+      
+      // Check YouTube connection on page load (with a small delay to let the page fully render)
+      setTimeout(checkYouTubeConnection, 1000);
+
+      // Add keyboard shortcuts
+      document.addEventListener('keydown', function(e) {
+        // Alt + A to approve first pending video
+        if (e.altKey && e.key === 'a') {
+          const approveBtn = document.querySelector('a[href*="approve"]');
+          if (approveBtn) {
+            e.preventDefault();
+            approveBtn.click();
+          }
+        }
+        
+        // Alt + R to reject first pending video
+        if (e.altKey && e.key === 'r') {
+          const rejectBtn = document.querySelector('a[href*="reject"]');
+          if (rejectBtn) {
+            e.preventDefault();
+            rejectBtn.click();
+          }
+        }
+      });
+
+      // Add tooltips for better UX
+      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+    });
+
+    // Add CSS animations
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideInDown {
+        from {
+          transform: translateY(-100px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      
+      .fade-in {
+        animation: fadeIn 0.5s ease-in;
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Function to refresh YouTube connection status
+    function refreshYouTubeStatus() {
+      fetch('/youtube/api/youtube-status')
+        .then(response => response.json())
+        .then(data => {
+          const statusDiv = document.querySelector('.youtube-status');
+          const channelInfo = document.querySelector('.youtube-channel-info');
+          
+          if (data.connected) {
+            statusDiv.className = 'youtube-status connected-status';
+            statusDiv.innerHTML = `
+              <i class="fas fa-check-circle me-2"></i>
+              Connected to: <strong>${data.channel_name}</strong>
+            `;
+            if (channelInfo) {
+              channelInfo.innerHTML = 'Your channel is connected and ready to receive uploads.';
+            }
+          } else {
+            statusDiv.className = 'youtube-status disconnected-status';
+            statusDiv.innerHTML = `
+              <i class="fas fa-exclamation-circle me-2"></i>
+              Not connected to YouTube
+            `;
+            if (channelInfo) {
+              channelInfo.innerHTML = 'Connect your YouTube channel to start approving and publishing videos from your editors.';
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error refreshing YouTube status:', error);
+        });
+    }
+
+    // Function to refresh notification count
+    function refreshNotificationCount() {
+      fetch('/youtube/api/notifications/count')
+        .then(response => response.json())
+        .then(data => {
+          const badge = document.querySelector('.notification-badge');
+          if (badge) {
+            badge.textContent = data.pending;
+            badge.style.display = data.pending > 0 ? 'inline-block' : 'none';
+          }
+        })
+        .catch(error => {
+          console.error('Error refreshing notification count:', error);
+        });
+    }
+
+    // Refresh status every 30 seconds
+    setInterval(() => {
+      refreshYouTubeStatus();
+      refreshNotificationCount();
+    }, 30000);
+
+    // Initial refresh after page load
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        refreshYouTubeStatus();
+        refreshNotificationCount();
+      }, 1000);
+    });
+
+    // 🔧 AdSense Debug Information
+    window.addEventListener('load', function() {
+      setTimeout(() => {
+        console.log('🔧 AdSense Debug Check:');
+        console.log('- AdSense script loaded:', typeof adsbygoogle !== 'undefined');
+        console.log('- AdSense array length:', (window.adsbygoogle || []).length);
+        console.log('- Google ad client:', window.google_ad_client || 'Not found');
+        
+        if (typeof adsbygoogle === 'undefined') {
+          console.warn('⚠️ AdSense script not loaded. Check your internet connection or ad blockers.');
+        } else {
+          console.log('✅ AdSense script loaded successfully!');
+        }
+        
+        // Count ad units on page
+        const adUnits = document.querySelectorAll('.adsbygoogle');
+        console.log('- Ad units found on page:', adUnits.length);
+        
+        adUnits.forEach((unit, index) => {
+          console.log(`  Ad ${index + 1}:`, {
+            client: unit.getAttribute('data-ad-client'),
+            slot: unit.getAttribute('data-ad-slot'),
+            visible: unit.offsetHeight > 0
+          });
+        });
+      }, 3000);
+    });
+  </script>
+</body>
+</html>

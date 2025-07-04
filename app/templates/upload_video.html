@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Video - YouTube Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5425864168922727"
+     crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --primary-color: #FF0000;
+      --secondary-color: #282828;
+      --accent-color: #FF4444;
+      --success-color: #28a745;
+      --warning-color: #ffc107;
+      --background-light: #f8f9fa;
+      --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      --border-radius: 16px;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .navbar {
+      background: rgba(255, 255, 255, 0.95) !important;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand {
+      color: var(--primary-color) !important;
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+
+    .upload-container {
+      max-width: 900px;
+      margin: 2rem auto;
+    }
+
+    .main-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: none;
+      border-radius: var(--border-radius);
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+    }
+
+    .upload-header {
+      background: linear-gradient(135deg, var(--primary-color) 0%, #CC0000 100%);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upload-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+      animation: pulse 4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.1; }
+      50% { transform: scale(1.05); opacity: 0.2; }
+    }
+
+    .upload-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .upload-header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      margin-bottom: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-indicator {
+      display: flex;
+      justify-content: center;
+      margin: 2rem 0;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      flex: 1;
+      max-width: 150px;
+    }
+
+    .step::after {
+      content: '';
+      position: absolute;
+      top: 20px;
+      right: -50%;
+      width: 100%;
+      height: 2px;
+      background: #e9ecef;
+      z-index: 0;
+    }
+
+    .step:last-child::after {
+      display: none;
+    }
+
+    .step.active::after {
+      background: var(--primary-color);
+    }
+
+    .step-number {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #e9ecef;
+      color: #6c757d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      transition: all 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step.active .step-number {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .step.completed .step-number {
+      background: var(--success-color);
+      color: white;
+    }
+
+    .step-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-align: center;
+      color: #6c757d;
+    }
+
+    .step.active .step-title {
+      color: var(--primary-color);
+    }
+
+    .creator-selection {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .creator-card {
+      background: white;
+      border: 2px solid #e9ecef;
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .creator-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255, 0, 0, 0.05) 0%, rgba(255, 0, 0, 0.1) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .creator-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+      border-color: var(--primary-color);
+    }
+
+    .creator-card:hover::before {
+      opacity: 1;
+    }
+
+    .creator-card.selected {
+      border-color: var(--primary-color);
+      background: linear-gradient(135deg, rgba(255, 0, 0, 0.05) 0%, rgba(255, 0, 0, 0.1) 100%);
+    }
+
+    .creator-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-color) 0%, #CC0000 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      margin: 0 auto 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .creator-info {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .creator-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #212529;
+    }
+
+    .creator-email {
+      color: #6c757d;
+      font-size: 0.9rem;
+      margin-bottom: 0;
+    }
+
+    .selection-check {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--success-color);
+      color: white;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      z-index: 2;
+    }
+
+    .creator-card.selected .selection-check {
+      display: flex;
+    }
+
+    .file-upload-zone {
+      border: 3px dashed #e9ecef;
+      border-radius: var(--border-radius);
+      padding: 3rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      background: rgba(248, 249, 250, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .file-upload-zone::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, transparent 40%, rgba(255, 0, 0, 0.05) 50%, transparent 60%);
+      transform: translateX(-100%);
+      transition: transform 0.6s ease;
+    }
+
+    .file-upload-zone:hover::before {
+      transform: translateX(100%);
+    }
+
+    .file-upload-zone.dragover {
+      border-color: var(--primary-color);
+      background: rgba(255, 0, 0, 0.05);
+    }
+
+    .file-upload-zone.has-file {
+      border-color: var(--success-color);
+      background: rgba(40, 167, 69, 0.05);
+    }
+
+    .upload-icon {
+      font-size: 4rem;
+      color: #6c757d;
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .file-upload-zone:hover .upload-icon {
+      color: var(--primary-color);
+      transform: scale(1.1);
+    }
+
+    .file-info-card {
+      background: white;
+      border: 2px solid var(--success-color);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .file-info-card.show {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-section {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-section h3 {
+      color: var(--secondary-color);
+      margin-bottom: 1.5rem;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+
+    .form-control, .form-select {
+      border-radius: 12px;
+      border: 2px solid #e9ecef;
+      padding: 0.875rem 1rem;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(255, 0, 0, 0.1);
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: var(--secondary-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .char-counter {
+      font-size: 0.875rem;
+      color: #6c757d;
+      margin-top: 0.25rem;
+    }
+
+    .char-counter.warning {
+      color: var(--warning-color);
+    }
+
+    .char-counter.danger {
+      color: var(--primary-color);
+    }
+
+    .btn-upload {
+      background: linear-gradient(135deg, var(--primary-color) 0%, #CC0000 100%);
+      border: none;
+      border-radius: 12px;
+      padding: 1rem 2rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-upload::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: all 0.3s ease;
+    }
+
+    .btn-upload:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn-upload:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(255, 0, 0, 0.3);
+    }
+
+    .btn-upload:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-upload:disabled:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    .alert-no-creators {
+      background: linear-gradient(135deg, #fff3cd 0%, #fef7e0 100%);
+      border: 2px solid #ffc107;
+      border-radius: var(--border-radius);
+      padding: 2rem;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .alert-no-creators i {
+      font-size: 3rem;
+      color: var(--warning-color);
+      margin-bottom: 1rem;
+    }
+
+    .loading-spinner {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .loading-spinner.show {
+      display: block;
+    }
+
+    .spinner-border {
+      width: 3rem;
+      height: 3rem;
+      border: 0.3em solid currentColor;
+      border-right-color: transparent;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+      .upload-container {
+        margin: 1rem;
+      }
+      
+      .creator-selection {
+        grid-template-columns: 1fr;
+      }
+      
+      .step-indicator {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .step::after {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <i class="fas fa-upload me-2"></i>Upload Studio
+      </a>
+      <a href="/editor" class="btn btn-outline-primary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+      </a>
+    </div>
+  </nav>
+
+  <div class="container upload-container">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+            <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }} me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Google AdSense Banner Ad -->
+    <div class="text-center mb-4">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-5425864168922727"
+           data-ad-slot="1283888354"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+      <script>
+           (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
+
+    <div class="main-card">
+      <!-- Header -->
+      <div class="upload-header">
+        <h1>
+          <i class="fas fa-cloud-upload-alt me-3"></i>
+          Upload Your Video
+        </h1>
+        <p>Create amazing content and share it with the world</p>
+      </div>
+
+      <div class="p-4">
+        <!-- Progress Steps -->
+        <div class="step-indicator">
+          <div class="step active" id="step1">
+            <div class="step-number">1</div>
+            <div class="step-title">Choose Creator</div>
+          </div>
+          <div class="step" id="step2">
+            <div class="step-number">2</div>
+            <div class="step-title">Upload File</div>
+          </div>
+          <div class="step" id="step3">
+            <div class="step-number">3</div>
+            <div class="step-title">Add Details</div>
+          </div>
+          <div class="step" id="step4">
+            <div class="step-number">4</div>
+            <div class="step-title">Submit</div>
+          </div>
+        </div>
+
+        <form id="uploadForm" action="{{ url_for('youtube.upload_process') }}" method="POST" enctype="multipart/form-data">
+          
+          <!-- Creator Selection -->
+          <div class="form-section">
+            <h3>
+              <i class="fas fa-users me-2"></i>
+              Select Creator
+            </h3>
+            <p class="text-muted mb-4">Choose the creator who will review and approve your video</p>
+            
+            {% if available_creators %}
+              <div class="creator-selection">
+                {% for creator in available_creators %}
+                  <div class="creator-card" data-creator-id="{{ creator.id }}">
+                    <div class="creator-avatar">
+                      {{ creator.name[0].upper() }}
+                    </div>
+                    <div class="creator-info">
+                      <div class="creator-name">{{ creator.name }}</div>
+                      <div class="creator-email">{{ creator.email }}</div>
+                    </div>
+                    <div class="selection-check">
+                      <i class="fas fa-check"></i>
+                    </div>
+                    <input type="radio" name="creator_id" value="{{ creator.id }}" class="d-none" required>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="alert-no-creators">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h4>No Creators Available</h4>
+                <p class="mb-3">You need to accept invitations from creators before you can upload videos.</p>
+                <a href="/editor" class="btn btn-primary">
+                  <i class="fas fa-arrow-left me-2"></i>
+                  Back to Dashboard
+                </a>
+              </div>
+            {% endif %}
+          </div>
+
+          {% if available_creators %}
+          <!-- File Upload -->
+          <div class="form-section">
+            <h3>
+              <i class="fas fa-file-video me-2"></i>
+              Upload Your Video
+            </h3>
+            <p class="text-muted mb-4">Drag and drop your video file or click to browse</p>
+            
+            <div class="file-upload-zone" id="fileUploadZone">
+              <div class="upload-icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+              </div>
+              <h5>Drag & Drop Your Video Here</h5>
+              <p class="text-muted">or click to browse files</p>
+              <input type="file" class="d-none" id="video_file" name="video_file" accept="video/*" required>
+              <small class="text-muted">
+                Supported formats: MP4, AVI, MOV, WMV, FLV, WebM, MKV<br>
+                Maximum size: 128GB
+              </small>
+            </div>
+            
+            <div class="file-info-card" id="fileInfoCard">
+              <div class="d-flex align-items-center">
+                <div class="me-3">
+                  <i class="fas fa-file-video fa-3x text-success"></i>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="mb-1" id="fileName">video.mp4</h6>
+                  <p class="text-muted mb-0" id="fileSize">125 MB</p>
+                </div>
+                <button type="button" class="btn btn-outline-danger btn-sm" id="removeFile">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video Details -->
+          <div class="form-section">
+            <h3>
+              <i class="fas fa-edit me-2"></i>
+              Video Details
+            </h3>
+            <p class="text-muted mb-4">Provide information about your video</p>
+            
+            <div class="row">
+              <div class="col-12 mb-3">
+                <label for="title" class="form-label">
+                  <i class="fas fa-heading me-2"></i>Video Title *
+                </label>
+                <input type="text" class="form-control" id="title" name="title" placeholder="Enter an engaging title for your video" required maxlength="100">
+                <div class="char-counter">
+                  <span id="titleCount">0</span>/100 characters
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="description" class="form-label">
+                <i class="fas fa-align-left me-2"></i>Description
+              </label>
+              <textarea class="form-control" id="description" name="description" rows="4" placeholder="Describe your video content, include relevant keywords and context" maxlength="1000"></textarea>
+              <div class="char-counter">
+                <span id="descCount">0</span>/1000 characters
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="tags" class="form-label">
+                  <i class="fas fa-tags me-2"></i>Tags
+                </label>
+                <input type="text" class="form-control" id="tags" name="tags" placeholder="gaming, tutorial, education">
+                <div class="form-text">Separate tags with commas</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="privacy" class="form-label">
+                  <i class="fas fa-eye me-2"></i>Privacy Setting
+                </label>
+                <select class="form-select" id="privacy" name="privacy">
+                  <option value="public">Public - Anyone can watch</option>
+                  <option value="unlisted">Unlisted - Only with link</option>
+                  <option value="private" selected>Private - Only creator</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Section -->
+          <div class="form-section">
+            <div class="d-flex justify-content-between align-items-center">
+              <a href="/editor" class="btn btn-outline-secondary btn-lg">
+                <i class="fas fa-arrow-left me-2"></i>Cancel
+              </a>
+              <button type="submit" class="btn btn-upload btn-lg text-white" id="submitBtn" disabled>
+                <i class="fas fa-upload me-2"></i>
+                Upload for Review
+              </button>
+            </div>
+          </div>
+          {% endif %}
+        </form>
+
+        <!-- Loading State -->
+        <div class="loading-spinner" id="loadingSpinner">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Uploading...</span>
+          </div>
+          <h5 class="mt-3">Uploading your video...</h5>
+          <p class="text-muted">Please don't close this window</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const fileInput = document.getElementById('video_file');
+      const fileUploadZone = document.getElementById('fileUploadZone');
+      const fileInfoCard = document.getElementById('fileInfoCard');
+      const fileName = document.getElementById('fileName');
+      const fileSize = document.getElementById('fileSize');
+      const removeFileBtn = document.getElementById('removeFile');
+      const submitBtn = document.getElementById('submitBtn');
+      const titleInput = document.getElementById('title');
+      const descriptionInput = document.getElementById('description');
+      const titleCount = document.getElementById('titleCount');
+      const descCount = document.getElementById('descCount');
+      const creatorCards = document.querySelectorAll('.creator-card');
+      const loadingSpinner = document.getElementById('loadingSpinner');
+      const steps = document.querySelectorAll('.step');
+
+      // Creator selection
+      creatorCards.forEach(card => {
+        card.addEventListener('click', function() {
+          // Remove selection from all cards
+          creatorCards.forEach(c => {
+            c.classList.remove('selected');
+          });
+          
+          // Select this card
+          this.classList.add('selected');
+          this.querySelector('input[type="radio"]').checked = true;
+          
+          // Update step
+          updateStep(1);
+          checkFormValid();
+        });
+      });
+
+      // File upload handling
+      if (fileUploadZone) {
+        fileUploadZone.addEventListener('click', () => fileInput.click());
+        
+        fileUploadZone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          fileUploadZone.classList.add('dragover');
+        });
+        
+        fileUploadZone.addEventListener('dragleave', () => {
+          fileUploadZone.classList.remove('dragover');
+        });
+        
+        fileUploadZone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          fileUploadZone.classList.remove('dragover');
+          const files = e.dataTransfer.files;
+          if (files.length > 0) {
+            fileInput.files = files;
+            handleFileSelect();
+          }
+        });
+
+        fileInput.addEventListener('change', handleFileSelect);
+        removeFileBtn.addEventListener('click', removeFile);
+      }
+
+      // Character counters
+      if (titleInput) {
+        titleInput.addEventListener('input', function() {
+          const count = this.value.length;
+          titleCount.textContent = count;
+          
+          if (count > 80) {
+            titleCount.parentElement.classList.add('warning');
+          } else {
+            titleCount.parentElement.classList.remove('warning');
+          }
+          
+          if (count > 95) {
+            titleCount.parentElement.classList.add('danger');
+          } else {
+            titleCount.parentElement.classList.remove('danger');
+          }
+          
+          checkFormValid();
+        });
+      }
+
+      if (descriptionInput) {
+        descriptionInput.addEventListener('input', function() {
+          const count = this.value.length;
+          descCount.textContent = count;
+          
+          if (count > 800) {
+            descCount.parentElement.classList.add('warning');
+          } else {
+            descCount.parentElement.classList.remove('warning');
+          }
+          
+          if (count > 950) {
+            descCount.parentElement.classList.add('danger');
+          } else {
+            descCount.parentElement.classList.remove('danger');
+          }
+        });
+      }
+
+      function handleFileSelect() {
+        const file = fileInput.files[0];
+        if (file) {
+          fileName.textContent = file.name;
+          fileSize.textContent = formatFileSize(file.size);
+          fileUploadZone.classList.add('has-file');
+          fileInfoCard.classList.add('show');
+          updateStep(2);
+          checkFormValid();
+        }
+      }
+
+      function removeFile() {
+        fileInput.value = '';
+        fileUploadZone.classList.remove('has-file');
+        fileInfoCard.classList.remove('show');
+        checkFormValid();
+      }
+
+      function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+
+      function updateStep(stepNumber) {
+        steps.forEach((step, index) => {
+          if (index < stepNumber) {
+            step.classList.add('completed');
+            step.classList.remove('active');
+          } else if (index === stepNumber) {
+            step.classList.add('active');
+            step.classList.remove('completed');
+          } else {
+            step.classList.remove('active', 'completed');
+          }
+        });
+      }
+
+      function checkFormValid() {
+        const hasFile = fileInput && fileInput.files.length > 0;
+        const hasTitle = titleInput && titleInput.value.trim().length > 0;
+        const hasCreator = document.querySelector('input[name="creator_id"]:checked');
+        
+        if (submitBtn) {
+          submitBtn.disabled = !(hasFile && hasTitle && hasCreator);
+        }
+
+        // Update steps based on form completion
+        if (hasTitle && hasFile && hasCreator) {
+          updateStep(3);
+        }
+      }
+
+      // Form submission
+      if (document.getElementById('uploadForm')) {
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+          if (submitBtn) {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
+            submitBtn.disabled = true;
+          }
+          
+          if (loadingSpinner) {
+            loadingSpinner.classList.add('show');
+          }
+          
+          updateStep(4);
+        });
+      }
+
+      // Auto-hide flash messages
+      const alerts = document.querySelectorAll('.alert');
+      alerts.forEach(alert => {
+        setTimeout(() => {
+          const bsAlert = new bootstrap.Alert(alert);
+          bsAlert.close();
+        }, 5000);
+      });
+    });
+  </script>
+</body>
+</html>

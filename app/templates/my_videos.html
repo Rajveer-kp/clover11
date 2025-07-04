@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Videos - YouTube Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5425864168922727"
+     crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --primary-color: #FF0000;
+      --secondary-color: #282828;
+      --accent-color: #FF4444;
+      --text-muted: #606060;
+      --background-light: #f8f9fa;
+      --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      --border-radius: 12px;
+    }
+
+    body {
+      background-color: var(--background-light);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .navbar {
+      background: linear-gradient(135deg, var(--secondary-color) 0%, #1a1a1a 100%) !important;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+
+    .card {
+      border: none;
+      border-radius: var(--border-radius);
+      box-shadow: var(--card-shadow);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .videos-header-card {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+      color: white;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .videos-header-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      transform: translate(30px, -30px);
+    }
+
+    .video-card {
+      transition: all 0.3s ease;
+      border-left: 4px solid transparent;
+    }
+
+    .video-card:hover {
+      transform: translateY(-5px);
+      border-left-color: var(--primary-color);
+    }
+
+    .video-thumbnail {
+      width: 120px;
+      height: 68px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+    }
+
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .status-pending {
+      background: rgba(255, 193, 7, 0.2);
+      color: #ff6b00;
+      border: 1px solid rgba(255, 193, 7, 0.5);
+    }
+
+    .status-approved {
+      background: rgba(40, 167, 69, 0.2);
+      color: #28a745;
+      border: 1px solid rgba(40, 167, 69, 0.5);
+    }
+
+    .status-rejected {
+      background: rgba(220, 53, 69, 0.2);
+      color: #dc3545;
+      border: 1px solid rgba(220, 53, 69, 0.5);
+    }
+
+    .stats-card {
+      transition: all 0.3s ease;
+      border-left: 4px solid transparent;
+    }
+
+    .stats-card:hover {
+      transform: translateY(-5px);
+      border-left-color: var(--primary-color);
+    }
+
+    .stats-number {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0.5rem 0;
+    }
+
+    .filter-tabs {
+      border-bottom: 2px solid #f1f3f5;
+      margin-bottom: 2rem;
+    }
+
+    .filter-tab {
+      padding: 1rem 1.5rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .filter-tab:hover {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .filter-tab.active {
+      color: var(--primary-color);
+      border-bottom-color: var(--primary-color);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+
+    .empty-state i {
+      font-size: 4rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .action-buttons .btn {
+      margin: 0 2px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .action-buttons .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    /* Ad styles */
+    .ad-container {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      margin: 1rem 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ad-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      transform: translate(30px, -30px);
+    }
+
+    .ad-label {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .ad-banner {
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      color: white;
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      margin: 1rem 0;
+      text-align: center;
+    }
+
+    .ad-sidebar {
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      color: #333;
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <i class="fab fa-youtube me-2"></i>Creator Studio
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{% if user.role == 'creator' %}/creator{% else %}/editor{% endif %}">
+              <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+            </a>
+          </li>
+          {% if user.role == 'editor' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/upload">
+              <i class="fas fa-upload me-1"></i>Upload
+            </a>
+          </li>
+          {% endif %}
+          <li class="nav-item">
+            <a class="nav-link active" href="/my-videos">
+              <i class="fas fa-video me-1"></i>My Videos
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/analytics">
+              <i class="fas fa-chart-line me-1"></i>Analytics
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/settings">
+              <i class="fas fa-cog me-1"></i>Settings
+            </a>
+          </li>
+        </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+              <div class="me-2">
+                <i class="fas fa-user-circle me-1"></i>
+                {% if user %}{{ user.name }}{% endif %}
+              </div>
+              <span class="badge bg-{% if user.role == 'creator' %}success{% else %}info{% endif %}">{{ user.role.title() }}</span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i>Profile</a></li>
+              <li><a class="dropdown-item" href="/settings"><i class="fas fa-cog me-2"></i>Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container-fluid mt-4">
+    <div class="row">
+      <div class="col-lg-9">
+        <!-- Header Card -->
+        <div class="card videos-header-card shadow-sm mb-4">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h1 class="mb-3">
+                  <i class="fas fa-video me-2"></i>
+                  My Videos
+                </h1>
+                <p class="mb-0 fs-5 opacity-90">
+                  {% if user.role == 'creator' %}
+                    Manage all videos assigned to your channel.
+                  {% else %}
+                    Track your uploaded videos and their approval status.
+                  {% endif %}
+                </p>
+              </div>
+              <div class="col-md-4 text-md-end">
+                <div class="d-flex flex-column align-items-md-end">
+                  <div class="badge bg-light text-dark fs-6 px-3 py-2 mb-2">
+                    <i class="fas fa-video me-1"></i>
+                    {{ videos|length }} Total Videos
+                  </div>
+                  {% if user.role == 'editor' %}
+                    <a href="/upload" class="btn btn-light">
+                      <i class="fas fa-plus me-2"></i>Upload New Video
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Cards Row -->
+        <div class="row mb-4">
+          <div class="col-md-4 mb-3">
+            <div class="card stats-card h-100">
+              <div class="card-body text-center">
+                <i class="fas fa-clock fa-2x mb-3 text-warning"></i>
+                <h5 class="card-title">Pending</h5>
+                <div class="stats-number text-warning">{{ pending_videos|length }}</div>
+                <small class="text-muted">{% if user.role == 'creator' %}Awaiting approval{% else %}Under review{% endif %}</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="card stats-card h-100">
+              <div class="card-body text-center">
+                <i class="fas fa-check-circle fa-2x mb-3 text-success"></i>
+                <h5 class="card-title">Approved</h5>
+                <div class="stats-number text-success">{{ approved_videos|length }}</div>
+                <small class="text-muted">Successfully published</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="card stats-card h-100">
+              <div class="card-body text-center">
+                <i class="fas fa-times-circle fa-2x mb-3 text-danger"></i>
+                <h5 class="card-title">Rejected</h5>
+                <div class="stats-number text-danger">{{ rejected_videos|length }}</div>
+                <small class="text-muted">Need revision</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Advertisement Banner -->
+        <div class="ad-banner">
+          <div class="ad-label">Ad</div>
+          <h5><i class="fas fa-rocket me-2"></i>Boost Your Channel Growth!</h5>
+          <p class="mb-2">Get professional video editing services and grow your YouTube channel faster.</p>
+          <a href="#" class="btn btn-light btn-sm">
+            <i class="fas fa-external-link-alt me-1"></i>Learn More
+          </a>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs d-flex">
+          <a href="#" class="filter-tab active" data-filter="all">
+            <i class="fas fa-list me-1"></i>All Videos ({{ videos|length }})
+          </a>
+          <a href="#" class="filter-tab" data-filter="pending">
+            <i class="fas fa-clock me-1"></i>Pending ({{ pending_videos|length }})
+          </a>
+          <a href="#" class="filter-tab" data-filter="approved">
+            <i class="fas fa-check me-1"></i>Approved ({{ approved_videos|length }})
+          </a>
+          <a href="#" class="filter-tab" data-filter="rejected">
+            <i class="fas fa-times me-1"></i>Rejected ({{ rejected_videos|length }})
+          </a>
+        </div>
+
+        <!-- Videos List -->
+        <div id="videos-container">
+          {% if videos %}
+            <div class="video-group" data-status="all">
+              {% for video in videos %}
+                <div class="card video-card mb-3" data-status="{{ video.status }}">
+                  <div class="card-body">
+                    <div class="row align-items-center">
+                      <div class="col-md-2">
+                        <div class="video-thumbnail">
+                          <i class="fas fa-play-circle fa-2x text-muted"></i>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <h6 class="mb-1 fw-bold">{{ video.title }}</h6>
+                        {% if video.description %}
+                          <p class="text-muted mb-2 small">{{ video.description[:100] }}{% if video.description|length > 100 %}...{% endif %}</p>
+                        {% endif %}
+                        <div class="d-flex align-items-center gap-2">
+                          <span class="status-badge status-{{ video.status }}">
+                            {% if video.status == 'pending' %}
+                              <i class="fas fa-clock me-1"></i>Pending
+                            {% elif video.status == 'approved' %}
+                              <i class="fas fa-check me-1"></i>Approved
+                            {% else %}
+                              <i class="fas fa-times me-1"></i>Rejected
+                            {% endif %}
+                          </span>
+                          {% if video.tags %}
+                            {% for tag in video.tags.split(',')[:2] %}
+                              <span class="badge bg-light text-dark">#{{ tag.strip() }}</span>
+                            {% endfor %}
+                          {% endif %}
+                        </div>
+                      </div>
+                      <div class="col-md-2 text-center">
+                        <div class="text-muted small">
+                          {% if user.role == 'creator' %}
+                            <div><strong>Editor:</strong></div>
+                            <div>{{ video.uploader.name }}</div>
+                          {% else %}
+                            <div><strong>Creator:</strong></div>
+                            <div>{{ video.creator.name }}</div>
+                          {% endif %}
+                        </div>
+                      </div>
+                      <div class="col-md-2 text-end">
+                        <div class="action-buttons">
+                          {% if video.status == 'approved' and video.youtube_video_id %}
+                            <a href="https://www.youtube.com/watch?v={{ video.youtube_video_id }}" target="_blank" class="btn btn-outline-danger btn-sm">
+                              <i class="fab fa-youtube me-1"></i>YouTube
+                            </a>
+                          {% endif %}
+                          <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#videoModal{{ video.id }}">
+                            <i class="fas fa-eye me-1"></i>View
+                          </button>
+                        </div>
+                        <div class="text-muted small mt-2">
+                          {{ video.created_at.strftime('%b %d, %Y') if video.created_at else 'Unknown' }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Video Details Modal -->
+                <div class="modal fade" id="videoModal{{ video.id }}" tabindex="-1">
+                  <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">
+                          <i class="fas fa-video me-2"></i>{{ video.title }}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="col-md-4">
+                            <div class="video-thumbnail mx-auto" style="width: 100%; height: 200px;">
+                              <i class="fas fa-play-circle fa-4x text-muted"></i>
+                            </div>
+                            <div class="text-center mt-3">
+                              <span class="status-badge status-{{ video.status }}">
+                                {% if video.status == 'pending' %}
+                                  <i class="fas fa-clock me-1"></i>Pending Review
+                                {% elif video.status == 'approved' %}
+                                  <i class="fas fa-check me-1"></i>Approved
+                                {% else %}
+                                  <i class="fas fa-times me-1"></i>Rejected
+                                {% endif %}
+                              </span>
+                            </div>
+                          </div>
+                          <div class="col-md-8">
+                            <div class="row">
+                              <div class="col-sm-6">
+                                <h6><i class="fas fa-user me-1"></i>
+                                  {% if user.role == 'creator' %}Editor{% else %}Creator{% endif %}
+                                </h6>
+                                <p class="mb-3">
+                                  {% if user.role == 'creator' %}{{ video.uploader.name }}{% else %}{{ video.creator.name }}{% endif %}
+                                </p>
+                              </div>
+                              <div class="col-sm-6">
+                                <h6><i class="fas fa-calendar me-1"></i>Upload Date</h6>
+                                <p class="mb-3">{{ video.created_at.strftime('%B %d, %Y at %I:%M %p') if video.created_at else 'Unknown' }}</p>
+                              </div>
+                            </div>
+                            
+                            {% if video.description %}
+                              <h6><i class="fas fa-align-left me-1"></i>Description</h6>
+                              <div class="p-3 bg-light rounded mb-3">
+                                <p class="mb-0">{{ video.description }}</p>
+                              </div>
+                            {% endif %}
+                            
+                            {% if video.tags %}
+                              <h6><i class="fas fa-tags me-1"></i>Tags</h6>
+                              <div class="mb-3">
+                                {% for tag in video.tags.split(',') %}
+                                  <span class="badge bg-primary me-1 mb-1">#{{ tag.strip() }}</span>
+                                {% endfor %}
+                              </div>
+                            {% endif %}
+
+                            {% if video.status == 'approved' and video.youtube_video_id %}
+                              <h6><i class="fab fa-youtube me-1"></i>YouTube Link</h6>
+                              <div class="mb-3">
+                                <a href="https://www.youtube.com/watch?v={{ video.youtube_video_id }}" target="_blank" class="btn btn-danger">
+                                  <i class="fab fa-youtube me-2"></i>Watch on YouTube
+                                </a>
+                              </div>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                          <i class="fas fa-times me-1"></i>Close
+                        </button>
+                        {% if video.status == 'approved' and video.youtube_video_id %}
+                          <a href="https://www.youtube.com/watch?v={{ video.youtube_video_id }}" target="_blank" class="btn btn-danger">
+                            <i class="fab fa-youtube me-1"></i>View on YouTube
+                          </a>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state">
+              <i class="fas fa-video text-muted"></i>
+              <h5 class="text-muted">No videos found</h5>
+              <p class="text-muted">
+                {% if user.role == 'creator' %}
+                  No videos have been assigned to your channel yet.
+                {% else %}
+                  You haven't uploaded any videos yet. Start by uploading your first video!
+                {% endif %}
+              </p>
+              {% if user.role == 'editor' %}
+                <a href="/upload" class="btn btn-primary">
+                  <i class="fas fa-plus me-2"></i>Upload Your First Video
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Sidebar with Ads -->
+      <div class="col-lg-3">
+        <!-- Ad Container 1 -->
+        <div class="ad-sidebar">
+          <div class="ad-label">Sponsored</div>
+          <h6><i class="fas fa-tools me-2"></i>Video Editing Tools</h6>
+          <p class="small mb-3">Professional video editing software for creators. Free trial available!</p>
+          <a href="#" class="btn btn-primary btn-sm">
+            <i class="fas fa-download me-1"></i>Download Now
+          </a>
+        </div>
+
+        <!-- Ad Container 2 -->
+        <div class="ad-container">
+          <div class="ad-label">Ad</div>
+          <h6><i class="fas fa-microphone me-2"></i>Podcast Hosting</h6>
+          <p class="small mb-3">Start your podcast today with unlimited hosting and analytics.</p>
+          <a href="#" class="btn btn-light btn-sm">
+            <i class="fas fa-external-link-alt me-1"></i>Get Started
+          </a>
+        </div>
+
+        <!-- Ad Container 3 -->
+        <div class="ad-sidebar">
+          <div class="ad-label">Promoted</div>
+          <h6><i class="fas fa-chart-line me-2"></i>Analytics Pro</h6>
+          <p class="small mb-3">Advanced analytics and insights for your YouTube channel growth.</p>
+          <a href="#" class="btn btn-dark btn-sm">
+            <i class="fas fa-star me-1"></i>Upgrade Now
+          </a>
+        </div>
+
+        <!-- Ad Container 4 -->
+        <div class="ad-container">
+          <div class="ad-label">Sponsored</div>
+          <h6><i class="fas fa-camera me-2"></i>Stock Footage</h6>
+          <p class="small mb-3">Millions of high-quality stock videos for your projects. Commercial license included.</p>
+          <a href="#" class="btn btn-light btn-sm">
+            <i class="fas fa-play me-1"></i>Browse Library
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Filter functionality
+      const filterTabs = document.querySelectorAll('.filter-tab');
+      const videoCards = document.querySelectorAll('.video-card');
+
+      filterTabs.forEach(tab => {
+        tab.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          // Update active tab
+          filterTabs.forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Filter videos
+          const filter = this.dataset.filter;
+          videoCards.forEach(card => {
+            if (filter === 'all' || card.dataset.status === filter) {
+              card.style.display = 'block';
+              card.style.animation = 'fadeIn 0.3s ease';
+            } else {
+              card.style.display = 'none';
+            }
+          });
+        });
+      });
+
+      // Add hover effects to video cards
+      const videoCards2 = document.querySelectorAll('.video-card');
+      videoCards2.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-5px) scale(1.02)';
+        });
+        card.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0) scale(1)';
+        });
+      });
+
+      // Add animation for stats cards
+      const statsCards = document.querySelectorAll('.stats-card');
+      statsCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-8px) scale(1.05)';
+        });
+        card.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0) scale(1)';
+        });
+      });
+
+      // Ad click tracking (for analytics)
+      const adContainers = document.querySelectorAll('.ad-container, .ad-sidebar, .ad-banner');
+      adContainers.forEach(ad => {
+        ad.addEventListener('click', function() {
+          // Track ad click for analytics
+          console.log('Ad clicked:', this.textContent.trim());
+        });
+      });
+    });
+
+    // CSS animations
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>

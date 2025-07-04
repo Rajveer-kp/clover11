@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Channel Settings - YouTube Uploader</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    .navbar-brand {
+      font-weight: bold;
+    }
+    .card {
+      border: none;
+      border-radius: 10px;
+    }
+    .settings-nav {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 1rem;
+    }
+    .settings-nav .nav-link {
+      color: #495057;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 0.25rem;
+      transition: all 0.2s;
+    }
+    .settings-nav .nav-link:hover {
+      background-color: #e9ecef;
+      color: #495057;
+    }
+    .settings-nav .nav-link.active {
+      background-color: #0d6efd;
+      color: white;
+    }
+    .channel-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .channel-banner {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 2px dashed #dee2e6;
+    }
+    .form-section {
+      background: white;
+      border-radius: 10px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .section-title {
+      color: #495057;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #e9ecef;
+    }
+    .upload-area {
+      border: 2px dashed #dee2e6;
+      border-radius: 10px;
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    .upload-area:hover {
+      border-color: #0d6efd;
+      background-color: #f8f9ff;
+    }
+    .upload-area.dragover {
+      border-color: #0d6efd;
+      background-color: #e7f1ff;
+    }
+    .tag-input {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      min-height: 38px;
+      padding: 0.375rem 0.75rem;
+      border: 1px solid #ced4da;
+      border-radius: 0.375rem;
+      background-color: #fff;
+    }
+    .tag {
+      background: #0d6efd;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 15px;
+      font-size: 0.875rem;
+      margin: 0.125rem;
+      display: flex;
+      align-items: center;
+    }
+    .tag .remove-tag {
+      margin-left: 0.5rem;
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+    .tag-add-input {
+      border: none;
+      outline: none;
+      flex: 1;
+      min-width: 100px;
+      padding: 0.25rem;
+    }
+    .privacy-option {
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .privacy-option:hover {
+      border-color: #0d6efd;
+      background-color: #f8f9ff;
+    }
+    .privacy-option.selected {
+      border-color: #0d6efd;
+      background-color: #e7f1ff;
+    }
+    .analytics-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 10px;
+    }
+    .stat-item {
+      text-align: center;
+      padding: 1rem;
+    }
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1050;
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/dashboard">
+        <i class="fas fa-video me-2"></i>YouTube Uploader
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/dashboard">
+              <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/creator">
+              <i class="fas fa-users me-1"></i>Creators
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/editor">
+              <i class="fas fa-edit me-1"></i>Editors
+            </a>
+          </li>
+        </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-user-circle me-1"></i>Account
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i>Profile</a></li>
+              <li><a class="dropdown-item active" href="/channel-settings"><i class="fas fa-cog me-2"></i>Channel Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid mt-4">
+    <div class="row">
+      <!-- Settings Navigation -->
+      <div class="col-lg-3 col-md-4 mb-4">
+        <div class="settings-nav sticky-top" style="top: 100px;">
+          <h5 class="mb-3"><i class="fas fa-cog me-2"></i>Settings</h5>
+          <nav class="nav flex-column">
+            <a class="nav-link active" href="#general" data-section="general">
+              <i class="fas fa-info-circle me-2"></i>General
+            </a>
+            <a class="nav-link" href="#branding" data-section="branding">
+              <i class="fas fa-palette me-2"></i>Branding
+            </a>
+            <a class="nav-link" href="#upload-defaults" data-section="upload-defaults">
+              <i class="fas fa-upload me-2"></i>Upload Defaults
+            </a>
+            <a class="nav-link" href="#permissions" data-section="permissions">
+              <i class="fas fa-shield-alt me-2"></i>Permissions
+            </a>
+            <a class="nav-link" href="#monetization" data-section="monetization">
+              <i class="fas fa-dollar-sign me-2"></i>Monetization
+            </a>
+            <a class="nav-link" href="#analytics" data-section="analytics">
+              <i class="fas fa-chart-bar me-2"></i>Analytics
+            </a>
+            <a class="nav-link" href="#advanced" data-section="advanced">
+              <i class="fas fa-sliders-h me-2"></i>Advanced
+            </a>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Settings Content -->
+      <div class="col-lg-9 col-md-8">
+        <form id="channelSettingsForm">
+          <!-- General Settings -->
+          <div class="settings-section" id="general-section">
+            <div class="form-section">
+              <h3 class="section-title">
+                <i class="fas fa-info-circle me-2"></i>General Information
+              </h3>
+              
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="channelName" class="form-label">Channel Name</label>
+                  <input type="text" class="form-control" id="channelName" name="channelName" 
+                         value="{{ channel.name if channel else '' }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="channelHandle" class="form-label">Channel Handle</label>
+                  <div class="input-group">
+                    <span class="input-group-text">@</span>
+                    <input type="text" class="form-control" id="channelHandle" name="channelHandle" 
+                           value="{{ channel.handle if channel else '' }}">
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="channelDescription" class="form-label">Channel Description</label>
+                <textarea class="form-control" id="channelDescription" name="channelDescription" 
+                          rows="4" maxlength="1000">{{ channel.description if channel else '' }}</textarea>
+                <div class="form-text">Describe what your channel is about. Maximum 1000 characters.</div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="channelCountry" class="form-label">Country/Region</label>
+                  <select class="form-select" id="channelCountry" name="channelCountry">
+                    <option value="">Select Country</option>
+                    <option value="US">United States</option>
+                    <option value="IN">India</option>
+                    <option value="GB">United Kingdom</option>
+                    <option value="CA">Canada</option>
+                    <option value="AU">Australia</option>
+                    <option value="DE">Germany</option>
+                    <option value="FR">France</option>
+                    <option value="JP">Japan</option>
+                    <option value="BR">Brazil</option>
+                    <option value="MX">Mexico</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="channelLanguage" class="form-label">Primary Language</label>
+                  <select class="form-select" id="channelLanguage" name="channelLanguage">
+                    <option value="">Select Language</option>
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="de">German</option>
+                    <option value="pt">Portuguese</option>
+                    <option value="ja">Japanese</option>
+                    <option value="ko">Korean</option>
+                    <option value="zh">Chinese</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Channel Keywords</label>
+                <div class="tag-input" id="keywordTags">
+                  <input type="text" class="tag-add-input" placeholder="Add keywords...">
+                </div>
+                <div class="form-text">Add keywords that describe your channel content.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Branding Settings -->
+          <div class="settings-section" id="branding-section" style="display: none;">
+            <div class="form-section">
+              <h3 class="section-title">
+                <i class="fas fa-palette me-2"></i>Channel Branding
+              </h3>
+
+              <div class="row mb-4">
+                <div class="col-md-6">
+                  <h5>Channel Avatar</h5>
+                  <div class="text-center mb-3">
+                    <img src="{{ channel.avatar_url if channel and channel.avatar_url else '/static/default-avatar.png' }}" 
+                         alt="Channel Avatar" class="channel-avatar" id="avatarPreview">
+                  </div>
+                  <div class="upload-area" onclick="document.getElementById('avatarUpload').click()">
+                    <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                    <p class="mb-0">Click to upload avatar</p>
+                    <small class="text-muted">Recommended: 800x800px, PNG or JPG</small>
+                  </div>
+                  <input type="file" id="avatarUpload" name="avatar" accept="image/*" style="display: none;">
+                </div>
+
+                <div class="col-md-6">
+                  <h5>Channel Banner</h5>
+                  <div class="mb-3">
+                    <img src="{{ channel.banner_url if channel and channel.banner_url else '/static/default-banner.png' }}" 
+                         alt="Channel Banner" class="channel-banner" id="bannerPreview">
+                  </div>
+                  <div class="upload-area" onclick="document.getElementById('bannerUpload').click()">
+                    <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                    <p class="mb-0">Click to upload banner</p>
+                    <small class="text-muted">Recommended: 2560x1440px, PNG or JPG</small>
+                  </div>
+                  <input type="file" id="bannerUpload" name="banner" accept="image/*" style="display: none;">
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="brandColor" class="form-label">Brand Color</label>
+                  <div class="input-group">
+                    <input type="color" class="form-control form-control-color" id="brandColor" 
+                           name="brandColor" value="{{ channel.brand_color if channel else '#0d6efd' }}">
+                    <input type="text" class="form-control" value="{{ channel.brand_color if channel else '#0d6efd' }}" 
+                           id="brandColorText">
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="channelTrailer" class="form-label">Channel Trailer URL</label>
+                  <input type="url" class="form-control" id="channelTrailer" name="channelTrailer" 
+                         value="{{ channel.trailer_url if channel else '' }}" 
+                         placeholder="https://youtube.com/watch?v=...">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upload Defaults -->
+          <div class="settings-section" id="upload-defaults-section" style="display: none;">
+            <div class="form-section">
+              <h3 class="section-title">
+                <i class="fas fa-upload me-2"></i>Upload Defaults
+              </h3>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="defaultVisibility" class="form-label">Default Visibility</label>
+                  <select class="form-select" id="defaultVisibility" name="defaultVisibility">
+                    <option value="private">Private</option>
+                    <option value="unlisted">Unlisted</option>
+                    <option value="public">Public</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="defaultCategory" class="form-label">Default Category</label>
+                  <select class="form-select" id="defaultCategory" name="defaultCategory">
+                    <option value="">Select Category</option>
+                    <option value="1">Film & Animation</option>
+                    <option value="2">Autos & Vehicles</option>
+                    <option value="10">Music</option>
+                    <option value="15">Pets & Animals</option>
+                    <option value="17">Sports</option>
+                    <option value="19">Travel & Events</option>
+                    <option value="20">Gaming</option>
+                    <option value="22">People & Blogs</option>
+                    <option value="23">Comedy</option>
+                    <option value="24">Entertainment</option>
+                    <option value="25">News & Politics</option>
+                    <option value="26">Howto & Style</option>
+                    <option value="27">Education</option>
+                    <option value="28">Science & Technology</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="defaultTags" class="form-label">Default Tags</label>
+                <div class="tag-input" id="defaultTagsInput">
+                  <input type="text" class="tag-add-input" placeholder="Add default tags...">
+                </div>
+                <div class="form-text">These tags will be automatically added to new uploads.</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="defaultDescription" class="form-label">Default Description Template</label>
+                <textarea class="form-control" id="defaultDescription" name="defaultDescription" rows="4" 
+                          placeholder="Enter default description template..."></textarea>
+                <div class="form-text">This template will be used for new video descriptions.</div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="autoPublish" name="autoPublish">
+                    <label class="form-check-label" for="autoPublish">
+                      Auto-publish after approval
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="enableComments" name="enableComments" checked>
+                    <label class="form-check-label" for="enableComments">
+                      Enable comments by default
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Permissions -->
+          <div class="settings-section" id="permissions-section" style="display: none;">
+            <div class="form-section">
+              <h3 class="section-title">
+                <i class="fas fa-shield-alt me-2"></i>Channel Permissions
+              </h3>
+
+              <div class="mb-4">
+                <h5>Team Member Roles</h5>
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Permissions</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="teamMembersList">
+                      <!-- Team members will be populated here -->
+                      <tr>
+                        <td>
+                          <div class="d-flex align-items-center">
+                            <img src="/static/default-avatar.png" class="rounded-circle me-2" width="32" height="32">
+                            <span>John Doe</span>
+                          </div>
+                        </td>
+                        <td><span class="badge bg-primary">Editor</span></td>
+                        <td><small class="text-muted">Upload, Edit</small></td>
+                        <td>
+                          <button class="btn btn-sm btn-outline-primary">Edit</button>
+                          <button class="btn btn-sm btn-outline-danger">Remove</button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#inviteModal">
+                  <i class="fas fa-plus me-1"></i>Invite Team Member
+                </button>
+              </div>
+
+              <div class="mb-4">
+                <h5>Content Restrictions</h5>
+                <div class="form-check form-switch mb-3">
+                  <input class="form-check-input" type="checkbox" id="requireApproval" name="requireApproval" checked>
+                  <label class="form-check-label" for="requireApproval">
+                    Require approval before publishing
+                  </label>
+                </div>
+                <div class="form-check form-switch mb-3">
+                  <input class="form-check-input" type="checkbox" id="allowScheduling" name="allowScheduling" checked>
+                  <label class="form-check-label" for="allowScheduling">
+                    Allow scheduled publishing
+                  </label>
+                </div>
+                <div class="form-check form-switch mb-3">
+                  <input class="form-check-input" type="checkbox" id="restrictUploads" name="restrictUploads">
+                  <label class="form-check-label" for="restrictUploads">
+                    Restrict uploads to specific file types
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Monetization -->
+          <div class="settings-section" id="monetization-section" style="display: none;">
+            <div class="form-section">
+              <h3 class="section-title">
+                <i class="fas fa-dollar-sign me-2"></i>Monetization Settings
+              </h3>
+
+              <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Monetization features require YouTube Partner Program eligibility.
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="enableMonetization" name="enableMonetization">
+                    <label class="form-check-label" for="enableMonetization">
+                      Enable monetization
+                    </label>
+                  </div>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="enableMemberships" name="enableMemberships">
+                    <label class="form-check-label" for="enableMemberships">
+                      Enable channel memberships
+                    </label>
+                  </div>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="enableSuperChat" name="enableSuperChat">
+                    <label class="form-check-label" for="enableSuperChat">
+                      Enable Super Chat & Super Thanks
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="enableMerchShelf" name="enableMerchShelf">
+                    <label class="form-check-label" for="enableMerchShelf">
+                      Enable merchandise shelf
+                    </label>
+                  </div>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="enableBrandConnect" name="enableBrandConnect">
+                    <label class="form-check-label" for="enableBrandConnect">
+                      Enable Brand Connect
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="payoutThreshold" class="form-label">Payout Threshold</label>
+                <select class="form-select" id="payoutThreshold" name="payoutThreshold">
+                  <option value="100">$100</option>
+                  <option value="200">$200</option>
+                  <option value="500">$500</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analytics -->
+          <div class="settings-section" id="analytics-section" style="display: none;">
+            <div class="form-section">
+              <h3 class="section-title">
+                <i class="fas fa-chart-bar me-2"></i>Analytics & Insights
+              </h3>
+
+              <div class="row mb-4">
+                <div class="col-md-3">
+                  <div class="analytics-card">
+                    <div class="stat-item">
+                      <h4>1.2M</h4>
+                      <small>Total Views</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="analytics-card">
+                    <div class="stat-item">
+                      <h4>45.6K</h4>
+                      <small>Subscribers</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="analytics-card">
+                    <div class="stat-item">
+                      <h4>156</h4>
+                      <small>Total Videos</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="analytics-card">
+                    <div class="stat-item">
+                      <h4>$1,234</h4>
+                      <small>Revenue</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="enableAnalytics" name="enableAnalytics" checked>
+                    <label class="form-check-label" for="enableAnalytics">
+                      Enable detailed analytics
+                    </label>
+                  </div>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="publicStats" name="publicStats">
+                    <label class="form-check-label" for="publicStats">
+                      Make subscriber count public
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="weeklyReports" name="weeklyReports" checked>
+                    <label class="form-check-label" for="weeklyReports">
+                      Receive weekly reports
+                    </label>
+                  </div>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="audienceInsights" name="audienceInsights" checked>
+                    <label class="form-check-label" for="audienceInsights">
+                      Enable audience insights
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Advanced Settings -->
+          <div class="settings-section" id="advanced-section" style="display: none;">
+            <div class="form-section">
+              <h3 class="section-title">
+                <i class="fas fa-sliders-h me-2"></i>Advanced Settings
+              </h3>
+
+              <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Warning:</strong> Advanced settings can affect your channel's functionality. Change with caution.
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <h5>API Settings</h5>
+                  <div class="mb-3">
+                    <label for="apiKey" class="form-label">YouTube API Key</label>
+                    <div class="input-group">
+                      <input type="password" class="form-control" id="apiKey" name="apiKey" value="••••••••••••••••">
+                      <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('apiKey')">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="webhookUrl" class="form-label">Webhook URL</label>
+                    <input type="url" class="form-control" id="webhookUrl" name="webhookUrl" 
+                           placeholder="https://your-site.com/webhook">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <h5>Integration Settings</h5>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="autoBackup" name="autoBackup" checked>
+                    <label class="form-check-label" for="autoBackup">
+                      Enable automatic backups
+                    </label>
+                  </div>
+                  <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="enableLogging" name="enableLogging" checked>
+                    <label class="form-check-label" for="enableLogging">
+                      Enable detailed logging
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-
