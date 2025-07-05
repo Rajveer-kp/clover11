@@ -13,10 +13,16 @@ services:
   - key: SECRET_KEY
     scope: RUN_TIME
     type: SECRET
-  - key: GOOGLE_CLIENT_ID
+  - key: GOOGLE_OAUTH_CLIENT_ID
     scope: RUN_TIME
     type: SECRET
-  - key: GOOGLE_CLIENT_SECRET
+  - key: GOOGLE_OAUTH_CLIENT_SECRET
+    scope: RUN_TIME
+    type: SECRET
+  - key: GOOGLE_OAUTH_PROJECT_ID
+    scope: RUN_TIME
+    type: SECRET
+  - key: GOOGLE_OAUTH_REDIRECT_URIS
     scope: RUN_TIME
     type: SECRET
   - key: FLASK_ENV

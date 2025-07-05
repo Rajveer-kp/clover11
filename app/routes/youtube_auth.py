@@ -31,21 +31,37 @@ SCOPES = [
     "https://www.googleapis.com/auth/youtube.readonly"
 ]
 
-# Client configuration - move to environment variables in production
-CLIENT_CONFIG = {
-    "web": {
-        "client_id": "15177856373-sl0cm3l80bncbsov7551ptm6jr40qmru.apps.googleusercontent.com",
-        "project_id": "trusty-coder-462513-h6", 
-        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-        "token_uri": "https://oauth2.googleapis.com/token",
-        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-        "client_secret": "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",
-        "redirect_uris": [
+# Client configuration - using environment variables for security
+def get_client_config():
+    """
+    Get client configuration from environment variables.
+    Falls back to development values if environment variables are not set.
+    """
+    # Get redirect URIs from environment or use development defaults
+    redirect_uris_env = os.getenv('GOOGLE_OAUTH_REDIRECT_URIS', '')
+    if redirect_uris_env:
+        redirect_uris = [uri.strip() for uri in redirect_uris_env.split(',')]
+    else:
+        # Development fallback
+        redirect_uris = [
             "http://127.0.0.1:5000/youtube/oauth2callback",
             "http://localhost:5000/youtube/oauth2callback"
         ]
+    
+    return {
+        "web": {
+            "client_id": os.getenv('GOOGLE_OAUTH_CLIENT_ID', '15177856373-sl0cm3l80bncbsov7551ptm6jr40qmru.apps.googleusercontent.com'),
+            "project_id": os.getenv('GOOGLE_OAUTH_PROJECT_ID', 'trusty-coder-462513-h6'),
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_secret": os.getenv('GOOGLE_OAUTH_CLIENT_SECRET', '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'),
+            "redirect_uris": redirect_uris
+        }
     }
-}
+
+# Get client configuration
+CLIENT_CONFIG = get_client_config()
 
 ALLOWED_VIDEO_EXTENSIONS = {'mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv'}
 MAX_FILE_SIZE = 128 * 1024 * 1024 * 1024  # 128GB

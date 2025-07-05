@@ -42,7 +42,7 @@ FLASK_ENV=production
 ### 5. Post-Deployment
 - Your app will be at: `https://youtube-manager.onrender.com`
 - Update Google Cloud Console redirect URIs:
-  `https://youtube-manager.onrender.com/youtube/callback`
+  `https://youtube-manager.onrender.com/youtube/oauth2callback`
 
 ## Advantages over Railway:
 - ✅ Better uptime and reliability

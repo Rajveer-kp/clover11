@@ -32,16 +32,24 @@
 In the Vercel dashboard, add these environment variables:
 
 ```bash
+# Flask Configuration
 SECRET_KEY=your-super-secret-key-here
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
 FLASK_ENV=production
+
+# Database Configuration
 DATABASE_URL=postgresql://username:password@hostname:port/database
+
+# Google OAuth Configuration (YouTube API)
+GOOGLE_OAUTH_CLIENT_ID=your-google-client-id
+GOOGLE_OAUTH_CLIENT_SECRET=your-google-client-secret
+GOOGLE_OAUTH_PROJECT_ID=your-google-project-id
+GOOGLE_OAUTH_REDIRECT_URIS=https://your-app-name.vercel.app/youtube/oauth2callback
 ```
 
-**For DATABASE_URL:**
-- Use a free PostgreSQL from [Neon](https://neon.tech) or [Supabase](https://supabase.com)
-- Or upgrade to Vercel Pro for integrated database
+**Important Notes:**
+- Replace `your-app-name` with your actual Vercel app name
+- For `DATABASE_URL`: Use a free PostgreSQL from [Neon](https://neon.tech) or [Supabase](https://supabase.com)
+- For Google OAuth variables: Get these from your Google Cloud Console
 
 ### 4. Deploy
 - Click "Deploy"
@@ -56,7 +64,7 @@ DATABASE_URL=postgresql://username:password@hostname:port/database
 3. Edit your OAuth 2.0 Client ID
 4. Add your Vercel domain to authorized redirect URIs:
    ```
-   https://your-app-name.vercel.app/youtube/callback
+   https://your-app-name.vercel.app/youtube/oauth2callback
    ```
 
 #### Test Your Application
@@ -101,8 +109,10 @@ clover/
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `SECRET_KEY` | Flask secret key for sessions | ✅ Yes |
-| `GOOGLE_CLIENT_ID` | YouTube API client ID | ✅ Yes |
-| `GOOGLE_CLIENT_SECRET` | YouTube API client secret | ✅ Yes |
+| `GOOGLE_OAUTH_CLIENT_ID` | YouTube API client ID | ✅ Yes |
+| `GOOGLE_OAUTH_CLIENT_SECRET` | YouTube API client secret | ✅ Yes |
+| `GOOGLE_OAUTH_PROJECT_ID` | Google Cloud project ID | ✅ Yes |
+| `GOOGLE_OAUTH_REDIRECT_URIS` | Comma-separated redirect URIs for OAuth | ✅ Yes |
 | `DATABASE_URL` | PostgreSQL connection string | ✅ Yes |
 | `FLASK_ENV` | Set to "production" | ✅ Yes |
 

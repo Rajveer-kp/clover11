@@ -22,10 +22,14 @@
    In Railway dashboard, add these variables:
    ```
    SECRET_KEY=your-secret-key-here
-   GOOGLE_CLIENT_ID=your-google-client-id
-   GOOGLE_CLIENT_SECRET=your-google-client-secret
+   GOOGLE_OAUTH_CLIENT_ID=your-google-client-id
+   GOOGLE_OAUTH_CLIENT_SECRET=your-google-client-secret
+   GOOGLE_OAUTH_PROJECT_ID=your-google-project-id
+   GOOGLE_OAUTH_REDIRECT_URIS=https://your-app.railway.app/youtube/oauth2callback
    FLASK_ENV=production
    ```
+   
+   **📋 For detailed environment variable setup, see [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md)**
 
 4. **Database Setup**
    - Railway will automatically provide PostgreSQL
@@ -41,7 +45,7 @@
    - Go to Google Cloud Console
    - Add your Railway domain to authorized redirect URIs:
      ```
-     https://your-app-name.railway.app/youtube/callback
+     https://your-app-name.railway.app/youtube/oauth2callback
      ```
 
 2. **Test Your App**
