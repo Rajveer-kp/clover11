@@ -1,0 +1,26 @@
+# Exclude video uploads from deployment
+pending_uploads/
+temp_uploads/
+
+# Exclude database files
+instance/
+*.db
+*.sqlite
+
+# Exclude Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Exclude development files
+.env
+.vscode/
+.DS_Store
+
+# Exclude Git files
+.git/
+.gitignore
+
+# Exclude documentation (optional)
+*.md
+!README.md
