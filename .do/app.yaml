@@ -1,0 +1,28 @@
+name: youtube-manager
+services:
+- name: web
+  source_dir: /
+  github:
+    repo: Rajveer-kp/clover11
+    branch: master
+  run_command: gunicorn wsgi:app
+  environment_slug: python
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  envs:
+  - key: SECRET_KEY
+    scope: RUN_TIME
+    type: SECRET
+  - key: GOOGLE_CLIENT_ID
+    scope: RUN_TIME
+    type: SECRET
+  - key: GOOGLE_CLIENT_SECRET
+    scope: RUN_TIME
+    type: SECRET
+  - key: FLASK_ENV
+    scope: RUN_TIME
+    value: production
+databases:
+- name: youtube-manager-db
+  engine: PG
+  version: "13"
