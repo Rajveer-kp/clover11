@@ -2,7 +2,6 @@ from flask import Blueprint, render_template, session, redirect, url_for, flash,
 from app.models.user import User
 from app.models.pending_video import PendingVideo
 from app.models.invitation import Invitation
-from app.models.advertisement import Advertisement, AdClick
 from app import db
 from datetime import datetime, timedelta
 from sqlalchemy import func
@@ -54,9 +53,6 @@ def creator_dashboard():
     youtube_connected = user.youtube_connected
     youtube_channel_name = user.youtube_channel_name or ''
 
-    # Get ads for dashboard
-    dashboard_ads = get_ads_for_page('dashboard', user.role)
-
     return render_template('creator_dashboard.html', 
                          user=user, 
                          pending_videos=pending_videos,
@@ -66,8 +62,7 @@ def creator_dashboard():
                          team_members=team_members,
                          current_date=current_date,
                          youtube_connected=youtube_connected,
-                         youtube_channel_name=youtube_channel_name,
-                         ads=dashboard_ads)
+                         youtube_channel_name=youtube_channel_name)
 
 
 # Editor Dashboard - manages YouTube uploads
@@ -104,9 +99,6 @@ def editor_dashboard():
     # Get current date
     current_date = datetime.now()
 
-    # Get ads for dashboard
-    dashboard_ads = get_ads_for_page('dashboard', user.role)
-
     return render_template('editor_dashboard.html', 
                          user=user, 
                          current_date=current_date,
@@ -115,8 +107,7 @@ def editor_dashboard():
                          approved_count=approved_count,
                          recent_videos=recent_videos,
                          approved_videos=approved_videos,
-                         pending_invitations=pending_invitations,
-                         ads=dashboard_ads)
+                         pending_invitations=pending_invitations)
 
 @views.route('/search-editors', methods=['GET'])
 def search_editors():
@@ -374,10 +365,7 @@ def analytics():
             'approval_rate': round((approved_uploads / total_uploads * 100) if total_uploads > 0 else 0, 1)
         }
 
-    # Get ads for analytics page
-    analytics_ads = get_ads_for_page('analytics', user.role)
-
-    return render_template('analytics.html', user=user, analytics=analytics_data, ads=analytics_ads)
+    return render_template('analytics.html', user=user, analytics=analytics_data)
 
 @views.route('/settings')
 def settings():
@@ -483,16 +471,12 @@ def my_videos():
     approved_videos = [v for v in videos if v.status == 'approved']
     rejected_videos = [v for v in videos if v.status == 'rejected']
     
-    # Get ads for my-videos page
-    video_ads = get_ads_for_page('my-videos', user.role)
-    
     return render_template('my_videos.html', 
                          user=user, 
                          videos=videos,
                          pending_videos=pending_videos,
                          approved_videos=approved_videos,
-                         rejected_videos=rejected_videos,
-                         ads=video_ads)
+                         rejected_videos=rejected_videos)
 
 @views.route('/upload')
 def upload_form():
@@ -525,80 +509,3 @@ def upload_form():
         return redirect(url_for('views.editor_dashboard'))
     
     return render_template('upload_video.html', user=user, creators=available_creators)
-
-# Helper function to get ads for templates
-def get_ads_for_page(placement, user_role=None):
-    """Get active advertisements for a specific placement and user role"""
-    query = Advertisement.query.filter(
-        Advertisement.placement == placement,
-        Advertisement.is_active == True
-    )
-    
-    # Filter by user role if specified
-    if user_role:
-        query = query.filter(
-            (Advertisement.target_role == user_role) | 
-            (Advertisement.target_role.is_(None))
-        )
-    
-    ads = query.all()
-    
-    # Filter by date range
-    active_ads = [ad for ad in ads if ad.is_currently_active()]
-    
-    # Update impressions
-    for ad in active_ads:
-        ad.impressions += 1
-    
-    db.session.commit()
-    
-    return active_ads
-
-# Ad click tracking route
-@views.route('/ad-click/<int:ad_id>')
-def track_ad_click(ad_id):
-    """Track advertisement clicks"""
-    ad = Advertisement.query.get_or_404(ad_id)
-    
-    # Increment click counter
-    ad.clicks += 1
-    
-    # Record detailed click information
-    user_id = session.get('user_id')
-    click_record = AdClick(
-        ad_id=ad_id,
-        user_id=user_id,
-        ip_address=request.remote_addr,
-        user_agent=request.headers.get('User-Agent', '')
-    )
-    
-    db.session.add(click_record)
-    db.session.commit()
-    
-    # Redirect to the ad's target URL
-    return redirect(ad.link_url if ad.link_url else '#')
-
-# Google AdSense configuration route
-@views.route('/ads-config')
-def ads_config():
-    """Display Google AdSense configuration for admins"""
-    if 'user_id' not in session:
-        flash("Please login first.", "warning")
-        return redirect(url_for('auth.login'))
-
-    user = User.query.get(session['user_id'])
-    if not user:
-        flash("User not found.", "danger")
-        return redirect(url_for('auth.login'))
-
-    # For now, only creators can manage ads (you can extend this to admin role)
-    if user.role != 'creator':
-        flash("Access denied. Admin access required.", "danger")
-        return redirect(url_for('views.creator_dashboard' if user.role == 'creator' else 'views.editor_dashboard'))
-
-    return render_template('ads_config.html', user=user)
-
-@views.route('/adsense-test')
-def adsense_test():
-    """AdSense debugging test page"""
-    return render_template('adsense_test.html')

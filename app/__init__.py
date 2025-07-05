@@ -8,7 +8,7 @@ from app.models.user import db  # SQLAlchemy instance
 from app.routes.auth import auth
 from app.routes.views import views
 from app.routes.youtube_auth import youtube_bp
-from app.adsense_config import get_adsense_script_tag, get_ad_unit, get_auto_ads_script, ADSENSE_CONFIG
+
 
 def create_app():
     # Load environment variables from .env file
@@ -35,26 +35,9 @@ def create_app():
     from app.models.user import User
     from app.models.pending_video import PendingVideo
     from app.models.invitation import Invitation
-    from app.models.advertisement import Advertisement, AdClick
-
-    # Add AdSense helper to template context
-    @app.context_processor
-    def inject_adsense():
-        return {
-            'adsense_script': get_adsense_script_tag(),
-            'adsense_auto_ads': get_auto_ads_script(),
-            'get_ad_unit': get_ad_unit,
-            'adsense_config': ADSENSE_CONFIG
-        }
 
     # Create database tables
     with app.app_context():
         db.create_all()
 
     return app
-
-# Create the Flask application instance
-app = create_app()
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(environ.get('PORT', 8080)))

@@ -270,6 +270,7 @@ def upload_process():
         title = request.form.get('title', '').strip()
         description = request.form.get('description', '').strip()
         tags = request.form.get('tags', '').strip()
+        privacy = request.form.get('privacy', 'private').strip()
         creator_id = request.form.get('creator_id')
         
         # Validate required fields
@@ -314,6 +315,11 @@ def upload_process():
             flash("File size too large. Maximum size is 128GB.", "error")
             return redirect(url_for('youtube.upload_video'))
         
+        # Validate privacy setting
+        valid_privacy_settings = ['public', 'unlisted', 'private']
+        if privacy not in valid_privacy_settings:
+            privacy = 'private'  # Default to private if invalid setting
+        
         # Create upload directory
         upload_dir = 'pending_uploads'
         os.makedirs(upload_dir, exist_ok=True)
@@ -331,6 +337,7 @@ def upload_process():
             title=title,
             description=description,
             tags=tags,
+            privacy_status=privacy,
             filename=filename,
             filepath=filepath,
             uploader_id=session['user_id'],
@@ -632,7 +639,7 @@ def upload_video_to_youtube(video):
                 'categoryId': '22'  # People & Blogs category
             },
             'status': {
-                'privacyStatus': 'public'  # You can make this configurable
+                'privacyStatus': video.privacy_status or 'private'  # Use the privacy setting from the video
             }
         }
         
