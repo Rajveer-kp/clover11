@@ -19,7 +19,16 @@ def create_app():
 
     # Basic Configurations
     app.secret_key = 'simple-production-key-2025'
-    app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DATABASE_URL', 'sqlite:///site.db')
+    
+    # Database configuration for Vercel (serverless environment)
+    database_url = environ.get('DATABASE_URL')
+    if database_url:
+        # Production: Use external database (PostgreSQL, etc.)
+        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    else:
+        # Development fallback: Use in-memory SQLite for Vercel compatibility
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['ENV'] = environ.get('FLASK_ENV', 'development')
 
@@ -36,8 +45,12 @@ def create_app():
     from app.models.pending_video import PendingVideo
     from app.models.invitation import Invitation
 
-    # Create database tables
+    # Create database tables only if we have a database
     with app.app_context():
-        db.create_all()
+        try:
+            db.create_all()
+        except Exception as e:
+            # Log the error but don't crash the app
+            print(f"Database initialization warning: {e}")
 
     return app
