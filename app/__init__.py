@@ -18,7 +18,7 @@ def create_app():
     app = Flask(__name__)
 
     # Basic Configurations
-    app.secret_key = environ.get('SECRET_KEY', 'dev-secret-key')
+    app.secret_key = 'simple-production-key-2025'
     app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DATABASE_URL', 'sqlite:///site.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['ENV'] = environ.get('FLASK_ENV', 'development')
